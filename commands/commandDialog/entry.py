@@ -8,8 +8,8 @@ ui = app.userInterface
 
 # TODO *** Specify the command identity information. ***
 CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_cmdDialog'
-CMD_NAME = 'Command Dialog Sample'
-CMD_Description = 'A Fusion Add-in Command with a dialog'
+CMD_NAME = 'FusionGPT LLM integration'
+CMD_Description = 'A Fusion Add-in bringing AI to Fusion'
 
 # Specify that the command will be promoted to the panel.
 IS_PROMOTED = True
