@@ -1,0 +1,14 @@
+{
+	"autodeskProduct":	"Fusion",
+	"type":	"addin",
+	"id":	"d3a1031d-e85a-459e-9086-9b002bb65fcc",
+	"author":	"Julian Stremel",
+	"description":	{
+		"":	"Fusion_GPT is an Autodesk Fusion 360 extension that integrates OpenAI's GPT models, allowing users to chat with AI directly within Fusion 360. The AI can provide design insights, answer questions, and interact with the Fusion 360 environment."
+	},
+	"version":	"0.0.1",
+	"runOnStartup":	true,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true,
+	"iconFilename":	"AddInIcon.svg"
+}
