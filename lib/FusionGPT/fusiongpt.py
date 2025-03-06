@@ -1,5 +1,5 @@
 import os
-from sqlite3 import connect
+from sqlite3 import connect,Connection,Cursor
 from .helper import install, checkSqlite, initSqlite
 
 try:
@@ -10,15 +10,20 @@ except:
 
 class FusionGPT:
 
+    api:OpenAI
+    sqlite:Connection
+    cursor:Cursor
+    path:str
+
     def __init__(self):
-        self.api = None
-        self.sqlite = None
-        self.cursor = None
-        self.path = os.path.dirname(__file__)
+        self.api                    = None
+        self.sqlite                 = None
+        self.cursor                 = None
+        self.path                   = os.path.dirname(__file__)
         if not checkSqlite():
             initSqlite()
-        self.sqlite = connect(os.path.join(self.path,"fusionGPT.db"))
-        self.cursor = self.sqlite.cursor()
+        self.sqlite                 = connect(os.path.join(self.path,"fusionGPT.db"))
+        self.cursor                 = self.sqlite.cursor()
         if not self.__checkOpenAIKey():
             print("OpenAI API Key not found. Please add it using the 'setOpenAIKey' command.")
         if not self.__checkOpenAIKeyValid():
@@ -33,10 +38,10 @@ class FusionGPT:
             self.api = OpenAI(api_key=key[0])
         return True
 
-    def __checkOpenAIKeyValid(key: str) -> bool:
-        openai = OpenAI(api_key=key)
+    def __checkOpenAIKeyValid(self) -> bool:
+
         try:
-            models = openai.models.list().to_dict()
+            models = self.api.models.list().to_dict()
             if len(models) > 0:
                 return True
             else:

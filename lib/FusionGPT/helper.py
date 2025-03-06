@@ -7,6 +7,9 @@ from sqlite3 import connect
 def install(package):
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+def freeze():
+    subprocess.check_call([sys.executable, "-m", "pip", "freeze"])
+
 def checkSqlite() -> bool:
     conn = connect(os.path.join(os.path.dirname(__file__),"fusionGPT.db"))
     cursor = conn.cursor()
