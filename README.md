@@ -12,4 +12,5 @@ Fusion_GPT is an Autodesk Fusion 360 extension that integrates OpenAI's GPT mode
 ## Notes
 Maybe implement backend generic to be able to use stuff like ollama
   - https://github.com/emirsahin1/llm-axe/blob/main/examples/ex_llm_setup.py
-  - https://github.com/szczyglis-dev/py-gpt 
+  - https://github.com/szczyglis-dev/py-gpt
+  - https://ai.pydantic.dev/
