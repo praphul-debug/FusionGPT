@@ -6,32 +6,44 @@ lib_path = os.path.join(os.path.dirname(__file__), "lib")
 if lib_path not in sys.path:
     sys.path.insert(0, lib_path)
 
-
-# Assuming you have not changed the general structure of the template no modification is needed in this file.
+# Import the commands module and utilities
 from . import commands
 from .lib import fusionAddInUtils as futil
 
-from FusionGPT import FusionGPT
+# Import FusionGPT class (optional, for advanced features)
+try:
+    from .lib.FusionGPT import FusionGPT
+    FUSIONGPT_AVAILABLE = True
+except ImportError as e:
+    print(f"FusionGPT class not available: {e}")
+    FUSIONGPT_AVAILABLE = False
 
 def run(context):
-
-    fusiongpt = FusionGPT()
-
     try:
-        # This will run the start function in each of your commands as defined in commands/__init__.py
+        # Initialize FusionGPT if available (optional)
+        if FUSIONGPT_AVAILABLE:
+            fusiongpt = FusionGPT()
+            print("CadxStudio AI Copilot: FusionGPT initialized successfully")
+        else:
+            print("CadxStudio AI Copilot: Running in basic mode")
+
+        # Start all commands - this is the main functionality
         commands.start()
+        print("CadxStudio AI Copilot: Add-in started successfully")
 
-    except:
+    except Exception as e:
         futil.handle_error('run')
-
+        print(f"CadxStudio AI Copilot: Error during startup: {e}")
 
 def stop(context):
     try:
-        # Remove all of the event handlers your app has created
+        # Remove all event handlers
         futil.clear_handlers()
 
-        # This will run the start function in each of your commands as defined in commands/__init__.py
+        # Stop all commands
         commands.stop()
+        print("CadxStudio AI Copilot: Add-in stopped successfully")
 
-    except:
+    except Exception as e:
         futil.handle_error('stop')
+        print(f"CadxStudio AI Copilot: Error during shutdown: {e}")
