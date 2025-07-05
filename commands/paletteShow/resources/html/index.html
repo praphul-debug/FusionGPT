@@ -2,38 +2,395 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CadxStudio AI Copilot</title>
     <script src="static/palette.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            margin: 8px;
+            overflow: hidden;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            padding: 24px 32px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+            gap: 32px;
+            overflow-y: auto;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            border-radius: 2px;
+        }
+
+        .ai-input-container {
+            position: relative;
+        }
+
+        .ai-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: #ffffff;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 
+                0 0 0 4px rgba(59, 130, 246, 0.1),
+                0 8px 32px rgba(59, 130, 246, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .ai-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .ai-button {
+            width: 100%;
+            padding: 16px 24px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #9333ea 100%);
+            border: none;
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .ai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+        }
+
+        .ai-button:hover::before {
+            left: 100%;
+        }
+
+        .ai-button:active {
+            transform: translateY(0);
+        }
+
+        .ai-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .response-area {
+            min-height: 100px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 12px;
+            border: 1px solid;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-processing {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .mock-model-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mock-model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #3b82f6, #9333ea);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mock-model-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        .mock-model-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .mock-model-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mock-model-card .icon {
+            font-size: 24px;
+            opacity: 0.8;
+        }
+
+        .mock-model-card p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .mock-model-card .command {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .keyboard-hint {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
 <body>
-<div>
+    <div class="container">
+        <div class="header">
+            <h1>CadxStudio AI Copilot</h1>
+            <p>Natural language 3D modeling for Fusion 360</p>
+        </div>
 
-    <h1>Fusion Palette Sample</h1>
-    <div>
-        <a href="https://help.autodesk.com/view/fusion360/ENU/?guid=GUID-6C0C8148-98D0-4DBC-A4EC-D8E03A8A3B5B">
-            Learn more about working with Palettes in Fusion
-        </a>
+        <div class="main-content">
+            <!-- AI Command Input Section -->
+            <div class="section">
+                <h3>🤖 AI Command Input</h3>
+                <div class="ai-input-container">
+                    <textarea 
+                        id="aiCommandInput" 
+                        class="ai-input" 
+                        placeholder="Describe what you want to create...&#10;&#10;Examples:&#10;• Create a 20mm cube&#10;• Make a gear with 24 teeth and 6mm bore&#10;• Create a hole with diameter 8mm and depth 15mm"
+                    ></textarea>
+                    <button id="processCommand" class="ai-button" onclick="processAICommand()">
+                        Process Command
+                    </button>
+                    <div class="keyboard-hint">Press Ctrl+Enter to submit</div>
+                </div>
+                
+                <div id="aiResponse" class="response-area">
+                    Ready to process your commands...
+                </div>
+            </div>
+
+            <!-- Quick Model Templates -->
+            <div class="section">
+                <h3>⚡ Quick Model Templates</h3>
+                <div class="templates-grid">
+                    <div class="mock-model-card" onclick="insertMockCommand('Create a gear with 24 teeth, module 2mm, and bore 6mm')">
+                        <h4><span class="icon">⚙️</span>Spur Gear</h4>
+                        <p>Standard gear with customizable teeth and bore</p>
+                        <div class="command">Create a gear with 24 teeth, module 2mm, and bore 6mm</div>
+                    </div>
+
+                    <div class="mock-model-card" onclick="insertMockCommand('Create a hole with diameter 8mm and depth 15mm')">
+                        <h4><span class="icon">🕳️</span>Precision Hole</h4>
+                        <p>Drill holes in selected faces</p>
+                        <div class="command">Create a hole with diameter 8mm and depth 15mm</div>
+                    </div>
+
+                    <div class="mock-model-card" onclick="insertMockCommand('Create a 30mm cube')">
+                        <h4><span class="icon">📦</span>Standard Cube</h4>
+                        <p>Basic rectangular solid</p>
+                        <div class="command">Create a 30mm cube</div>
+                    </div>
+
+                    <div class="mock-model-card" onclick="insertMockCommand('Make a cylinder with radius 15mm and height 40mm')">
+                        <h4><span class="icon">🔵</span>Cylinder</h4>
+                        <p>Cylindrical shape with custom dimensions</p>
+                        <div class="command">Make a cylinder with radius 15mm and height 40mm</div>
+                    </div>
+
+                    <div class="mock-model-card" onclick="insertMockCommand('Create a sphere with radius 20mm')">
+                        <h4><span class="icon">🌐</span>Sphere</h4>
+                        <p>Perfect spherical geometry</p>
+                        <div class="command">Create a sphere with radius 20mm</div>
+                    </div>
+
+                    <div class="mock-model-card" onclick="insertMockCommand('Extrude the selected face by 10mm')">
+                        <h4><span class="icon">📏</span>Face Extrude</h4>
+                        <p>Extend selected faces</p>
+                        <div class="command">Extrude the selected face by 10mm</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <br><hr>
-
-    <h3>Send Data to HTML Event Handler</h3>
-    <div style='margin-left: 30px;'>
-        <label for="sampleData"><b>Data to send:</b></label>
-        <input type="text" id="sampleData" value="Enter Some Text"><br/><br/>
-        <button type='button' onclick='sendInfoToFusion()' style='background-color: #cccccc; padding: 5px'>
-            <b>Send HTML Event</b>
-        </button>
-    </div>
-
-    <h3>HTML Event Response Value:</h3>
-    <div id='returnValue' style='margin-left: 30px;'>Response</div>
-
-    <h3>Message from "Send to Palette" Command</h3>
-    <div style='margin-left: 30px;'>
-        <p id='fusionMessage'>Message from Fusion</p>
-        <br/><br/>
-    </div>
-
-</div>
 </body>
 </html>
